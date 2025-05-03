@@ -9,6 +9,7 @@
     <div class="card">
         <div class="card-header">
             当前借阅和历史记录
+            <span class="float-end text-muted">还可借阅：{{ remain_borrow }}/{{ max_borrow }}</span>
         </div>
         <div class="card-body">
             {% if borrowed_books %}

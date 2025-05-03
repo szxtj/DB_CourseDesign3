@@ -22,6 +22,7 @@
                             <th scope="col">ID</th>
                             <th scope="col">用户名</th>
                             <th scope="col">角色</th>
+                            <th scope="col">借阅额度</th>
                             <!-- Add actions column if needed -->
                         </tr>
                     </thead>
@@ -35,7 +36,10 @@
                                     {{ user.role_name }}
                                 </span>
                             </td>
-                             <!-- Add action buttons here if needed, e.g., edit/delete -->
+                            <td>
+                                <span class="text-muted">{{ user.remain_borrow }}/{{ user.max_borrow }}</span>
+                            </td>
+                            <!-- Add action buttons here if needed, e.g., edit/delete -->
                         </tr>
                         {% endfor %}
                     </tbody>

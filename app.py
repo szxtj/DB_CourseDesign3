@@ -202,7 +202,6 @@ def return_book(record_id):
 @login_required
 def my_books():
     user_id = session['user_id']
-    
     conn = get_db_connection()
     try:
         with conn.cursor() as cursor:
@@ -216,10 +215,24 @@ def my_books():
                 (user_id,)
             )
             borrowed_books = cursor.fetchall()
+            # 查询最大可借书数和当前未归还数量
+            cursor.execute("""
+                SELECT r.max_borrow, (
+                    SELECT COUNT(*) FROM borrow_records WHERE user_id = %s AND is_returned = FALSE
+                ) AS current_borrowed
+                FROM users u JOIN roles r ON u.role_id = r.role_id WHERE u.user_id = %s
+            """, (user_id, user_id))
+            borrow_info = cursor.fetchone()
+            if borrow_info:
+                max_borrow = borrow_info['max_borrow']
+                current_borrowed = borrow_info['current_borrowed']
+                remain_borrow = max_borrow - current_borrowed
+            else:
+                max_borrow = 0
+                remain_borrow = 0
     finally:
         conn.close()
-        
-    return render_template('my_books.html', borrowed_books=borrowed_books)
+    return render_template('my_books.html', borrowed_books=borrowed_books, max_borrow=max_borrow, remain_borrow=remain_borrow)
 
 # 管理员路由：用户管理
 @app.route('/admin/users')
@@ -230,15 +243,19 @@ def admin_users():
     try:
         with conn.cursor() as cursor:
             cursor.execute(
-                """SELECT u.user_id, u.username, r.role_name 
+                """SELECT u.user_id, u.username, r.role_name, r.max_borrow, (
+                        SELECT COUNT(*) FROM borrow_records br WHERE br.user_id = u.user_id AND br.is_returned = FALSE
+                    ) AS current_borrowed
                    FROM users u 
                    JOIN roles r ON u.role_id = r.role_id 
                    ORDER BY u.user_id"""
             )
             users = cursor.fetchall()
+            # 为每个用户计算剩余可借阅数
+            for user in users:
+                user['remain_borrow'] = user['max_borrow'] - user['current_borrowed']
     finally:
         conn.close()
-        
     return render_template('admin/users.html', users=users)
 
 # 管理员路由：添加用户
