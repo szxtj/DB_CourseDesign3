@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}添加图书 - 图书管理系统{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4">添加图书</h2>
+
+    <div class="card">
+        <div class="card-header">
+            图书信息
+        </div>
+        <div class="card-body">
+            <form method="post" action="{{ url_for('add_book') }}">
+                <div class="mb-3">
+                    <label for="title" class="form-label">书名</label>
+                    <input type="text" class="form-control" id="title" name="title" required>
+                </div>
+                <div class="mb-3">
+                    <label for="author" class="form-label">作者</label>
+                    <input type="text" class="form-control" id="author" name="author" required>
+                </div>
+                <div class="mb-3">
+                    <label for="total_copies" class="form-label">数量</label>
+                    <input type="number" class="form-control" id="total_copies" name="total_copies" min="1" value="1" required>
+                </div>
+                <div class="mt-4 d-flex justify-content-between">
+                    <a href="{{ url_for('admin_books') }}" class="btn btn-secondary">返回图书列表</a>
+                    <button type="submit" class="btn btn-primary">确认添加</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

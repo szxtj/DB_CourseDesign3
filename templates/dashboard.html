@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}首页 - 图书管理系统{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="p-5 mb-4 bg-light rounded-3">
+                <h1 class="display-5 fw-bold">欢迎使用图书管理系统, {{ session.username }}!</h1>
+                <p class="fs-4">您可以在这里查看、借阅和归还图书。</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">图书列表</h5>
+                    <p class="card-text flex-grow-1">浏览所有可用的图书，并进行借阅操作。</p>
+                    <a href="{{ url_for('book_list') }}" class="btn btn-primary mt-auto">浏览图书</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">我的借阅</h5>
+                    <p class="card-text flex-grow-1">查看您当前借阅的图书和借阅历史记录。</p>
+                    <a href="{{ url_for('my_books') }}" class="btn btn-success mt-auto">查看我的借阅</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if session.role_name == '管理员' %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card bg-info text-white">
+                 <div class="card-body">
+                    <h5 class="card-title">管理功能</h5>
+                    <p class="card-text">管理用户、图书和借阅记录。</p>
+                    <div class="d-flex gap-2">
+                        <a href="{{ url_for('admin_users') }}" class="btn btn-outline-light">用户管理</a>
+                        <a href="{{ url_for('admin_books') }}" class="btn btn-outline-light">图书管理</a>
+                        <a href="{{ url_for('admin_borrow_records') }}" class="btn btn-outline-light">借阅记录</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

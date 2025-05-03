@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}添加用户 - 图书管理系统{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4">添加用户</h2>
+
+    <div class="card">
+        <div class="card-header">
+            用户信息
+        </div>
+        <div class="card-body">
+            <form method="post" action="{{ url_for('add_user') }}">
+                <div class="mb-3">
+                    <label for="username" class="form-label">用户名</label>
+                    <input type="text" class="form-control" id="username" name="username" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">密码</label>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                </div>
+                <div class="mb-3">
+                    <label for="role_id" class="form-label">角色</label>
+                    <select class="form-select" id="role_id" name="role_id" required>
+                        <option value="" disabled selected>请选择角色</option>
+                        {% for role in roles %}
+                        <option value="{{ role.role_id }}">{{ role.role_name }} (最大借书数: {{ role.max_borrow }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mt-4 d-flex justify-content-between">
+                    <a href="{{ url_for('admin_users') }}" class="btn btn-secondary">返回用户列表</a>
+                    <button type="submit" class="btn btn-primary">确认添加</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
