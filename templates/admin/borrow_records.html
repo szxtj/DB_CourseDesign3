@@ -36,6 +36,11 @@
                                 <span class="badge bg-primary">借阅中</span>
                                 {% endif %}
                             </td>
+                            <td>
+                                <form method="post" action="{{ url_for('admin_delete_borrow_record', record_id=record.record_id) }}" class="d-inline" onsubmit="return confirm('确定要删除该借阅记录吗？');">
+                                    <button type="submit" class="btn btn-sm btn-danger">删除</button>
+                                </form>
+                            </td>
                             <!-- Add action buttons here if needed -->
                         </tr>
                         {% endfor %}

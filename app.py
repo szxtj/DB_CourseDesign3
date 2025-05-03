@@ -342,5 +342,59 @@ def admin_borrow_records():
         
     return render_template('admin/borrow_records.html', records=records)
 
+@app.route('/delete-borrow-record/<int:record_id>', methods=['POST'])
+@login_required
+def delete_borrow_record(record_id):
+    user_id = session['user_id']
+    conn = get_db_connection()
+    try:
+        with conn.cursor() as cursor:
+            # 检查该记录是否属于当前用户
+            cursor.execute("SELECT * FROM borrow_records WHERE record_id = %s AND user_id = %s", (record_id, user_id))
+            record = cursor.fetchone()
+            if not record:
+                flash('无效的删除操作', 'danger')
+                return redirect(url_for('my_books'))
+            try:
+                conn.begin()
+                cursor.execute("DELETE FROM borrow_records WHERE record_id = %s", (record_id,))
+                conn.commit()
+                flash('借阅记录删除成功！', 'success')
+            except pymysql.MySQLError as e:
+                conn.rollback()
+                if '此记录对应的书籍尚未归还' in str(e):
+                    flash('无法删除：此记录对应的书籍尚未归还', 'danger')
+                else:
+                    flash(f'删除失败：{str(e)}', 'danger')
+    finally:
+        conn.close()
+    return redirect(url_for('my_books'))
+
+@app.route('/admin/delete-borrow-record/<int:record_id>', methods=['POST'])
+@login_required
+@role_required(['管理员'])
+def admin_delete_borrow_record(record_id):
+    conn = get_db_connection()
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT * FROM borrow_records WHERE record_id = %s", (record_id,))
+            record = cursor.fetchone()
+            if not record:
+                flash('无效的删除操作', 'danger')
+                return redirect(url_for('admin_borrow_records'))
+            try:
+                conn.begin()
+                cursor.execute("DELETE FROM borrow_records WHERE record_id = %s", (record_id,))
+                conn.commit()
+                flash('借阅记录删除成功！', 'success')
+            except pymysql.MySQLError as e:
+                conn.rollback()
+                if '此记录对应的书籍尚未归还' in str(e):
+                    flash('无法删除：此记录对应的书籍尚未归还', 'danger')
+                else:
+                    flash(f'删除失败：{str(e)}', 'danger')
+    finally:
+        conn.close()
+    return redirect(url_for('admin_borrow_records'))
 if __name__ == '__main__':
     app.run(debug=True)

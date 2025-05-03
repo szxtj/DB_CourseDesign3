@@ -39,8 +39,14 @@
                                 <form method="post" action="{{ url_for('return_book', record_id=book.record_id) }}" class="d-inline">
                                     <button type="submit" class="btn btn-sm btn-success">归还</button>
                                 </form>
+                                <form method="post" action="{{ url_for('delete_borrow_record', record_id=book.record_id) }}" class="d-inline ms-1" onsubmit="return confirm('确定要删除该借阅记录吗？');">
+                                    <button type="submit" class="btn btn-sm btn-danger">删除</button>
+                                </form>
                                 {% else %}
                                 <button class="btn btn-sm btn-outline-secondary" disabled>已归还</button>
+                                <form method="post" action="{{ url_for('delete_borrow_record', record_id=book.record_id) }}" class="d-inline ms-1" onsubmit="return confirm('确定要删除该借阅记录吗？');">
+                                    <button type="submit" class="btn btn-sm btn-danger">删除</button>
+                                </form>
                                 {% endif %}
                             </td>
                         </tr>
