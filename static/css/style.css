@@ -1,7 +1,7 @@
 /* Custom styles for the Library Management System */
 
 body {
-    padding-top: 56px; /* Adjust based on navbar height */
+    padding-top: 10px; /* 导航栏距离页面顶部的距离 */
     background-color: #f8f9fa;
 }
 
