@@ -413,5 +413,49 @@ def admin_delete_borrow_record(record_id):
     finally:
         conn.close()
     return redirect(url_for('admin_borrow_records'))
+
+# 管理员路由：删除用户
+@app.route('/admin/users/delete/<int:user_id>', methods=['POST'])
+@login_required
+@role_required(['管理员'])
+def delete_user(user_id):
+    conn = get_db_connection()
+    try:
+        with conn.cursor() as cursor:
+            # 检查是否为管理员账户
+            cursor.execute("SELECT u.user_id, r.role_name FROM users u JOIN roles r ON u.role_id = r.role_id WHERE u.user_id = %s", (user_id,))
+            user = cursor.fetchone()
+            
+            if not user:
+                flash('用户不存在', 'danger')
+                return redirect(url_for('admin_users'))
+                
+            if user['role_name'] == '管理员':
+                flash('不能删除管理员账户', 'danger')
+                return redirect(url_for('admin_users'))
+            
+            # 检查用户是否有未归还的图书
+            cursor.execute("SELECT COUNT(*) AS unreturned FROM borrow_records WHERE user_id = %s AND is_returned = FALSE", (user_id,))
+            result = cursor.fetchone()
+            
+            if result and result['unreturned'] > 0:
+                flash('该用户有未归还的图书，不能删除', 'danger')
+                return redirect(url_for('admin_users'))
+            
+            # 删除用户
+            try:
+                conn.begin()
+                # 先删除该用户的所有已归还的借阅记录
+                cursor.execute("DELETE FROM borrow_records WHERE user_id = %s AND is_returned = TRUE", (user_id,))
+                # 删除用户
+                cursor.execute("DELETE FROM users WHERE user_id = %s", (user_id,))
+                conn.commit()
+                flash('用户删除成功', 'success')
+            except pymysql.MySQLError as e:
+                conn.rollback()
+                flash(f'删除失败：{str(e)}', 'danger')
+    finally:
+        conn.close()
+    return redirect(url_for('admin_users'))
 if __name__ == '__main__':
     app.run(debug=True)

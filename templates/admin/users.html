@@ -23,7 +23,7 @@
                             <th scope="col">用户名</th>
                             <th scope="col">角色</th>
                             <th scope="col">借阅额度</th>
-                            <!-- Add actions column if needed -->
+                            <th scope="col">操作</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -39,7 +39,13 @@
                             <td>
                                 <span class="text-muted">{{ user.remain_borrow }}/{{ user.max_borrow }}</span>
                             </td>
-                            <!-- Add action buttons here if needed, e.g., edit/delete -->
+                            <td>
+                                {% if user.role_name != '管理员' %}
+                                <form action="{{ url_for('delete_user', user_id=user.user_id) }}" method="POST" class="d-inline" onsubmit="return confirm('确定要删除用户 {{ user.username }} 吗？')">
+                                    <button type="submit" class="btn btn-sm btn-danger">删除</button>
+                                </form>
+                                {% endif %}
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
